@@ -9,4 +9,3 @@ function printLabel(labeledObj: LabeledValue) {
 let myObj = { size: 10, label: "Size 10 Object" };
 printLabel(myObj)
 printLabel(myObj)
-p
