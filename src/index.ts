@@ -27,8 +27,6 @@ class Card {
             } else {
                 result += 11;
             }
-            // console.log(result)
-            // console.log(arrCards)
         }
 
     }
