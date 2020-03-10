@@ -16,11 +16,12 @@ class Cards {
         this.cardSuit = this.card + this.suit;
     }
 
-    push(card: Cards) {
-        if (arrCards.includes(card.cardSuit)) {
+    push() {
+        if (arrCards.includes(this.cardSuit)) {
             play();
         } else {
-            arrCards.push(card.cardSuit);
+
+            arrCards.push(this.cardSuit);
             this.includesCardPlace(this);
             if (+this.card > 2 && +this.card < 10) {
                 result += +this.card;
@@ -35,6 +36,7 @@ class Cards {
         let placeDiv = document.getElementById('main')
         let place = window.document.createElement('img')
         place.src = 'img/kor.jpg'
+        //place.src = 'img/' + card.cardSuit + '.jpg'
         place.id = 'card'
         place.style.marginRight = '10px'
         place.style.width = '75px'
@@ -47,7 +49,8 @@ class Cards {
 
 function play(): void {
     let c = new Cards();
-    c.push(c);
+    console.log(c);
+    c.push();
     if (activePlayer === 0) {
         resultPlayer = result
         window.document.getElementById('sumPlayer').innerHTML = `${resultPlayer}`
@@ -60,6 +63,7 @@ function play(): void {
 function playPC(): void {
     activePlayer = 1;
     result = 0
+
     while (resultPC < 14) {
         play();
     }
