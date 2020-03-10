@@ -2,35 +2,36 @@ var arr1: string[] = ['Clubs', 'Diamonds', 'Hearts', 'Spades'];
 var arr2: string[] = ['3', '4', '5', '6', '7', '8', '9', 'D', 'J', 'Q', 'K', 'A'];
 var arrCards: string[] = [];
 var result = 0;
+var activePlayer = 0;
 var resultPlayer = 0;
 var resultPC = 0;
-var activePlayer = 0;
-var totalPlayer = 0;
 var totalPC = 0;
+var totalPlayer = 0;
 
-class Card {
-    randCard: string;
-    randSuit: string;
+class Cards {
+    private suit = arr1[Math.floor(Math.random() * 4)];
+    private card = arr2[Math.floor(Math.random() * 12)];
+    cardSuit: string;
     constructor() {
-        this.randSuit = arr1[Math.floor(Math.random() * 4)];
-        this.randCard = arr2[Math.floor(Math.random() * 12)];
+        this.cardSuit = this.card + this.suit;
     }
-    includesCard(card: object) {
-        if (arrCards.includes(this.randCard + this.randSuit)) {
+
+    push(card: Cards) {
+        if (arrCards.includes(card.cardSuit)) {
             play();
         } else {
-            arrCards.push(this.randCard + this.randSuit)
-            if (+this.randCard > 2 && +this.randCard < 10) {
-                result += +this.randCard;
-            } else if (this.randCard === 'D' || this.randCard === 'J' || this.randCard === 'Q' || this.randCard === 'K') {
+            arrCards.push(card.cardSuit);
+            this.includesCardPlace(this);
+            if (+this.card > 2 && +this.card < 10) {
+                result += +this.card;
+            } else if (this.card === 'D' || this.card === 'J' || this.card === 'Q' || this.card === 'K') {
                 result += 10;
             } else {
                 result += 11;
             }
         }
-
     }
-    includesCardPlace(card: object): void {
+    includesCardPlace(card: Cards): void {
         let placeDiv = document.getElementById('main')
         let place = window.document.createElement('img')
         place.src = 'img/kor.jpg'
@@ -40,23 +41,20 @@ class Card {
         place.style.height = '150px'
         placeDiv.appendChild(place)
     }
-    refreshSum() {
-        if (activePlayer === 0) {
-            resultPlayer = result
-            window.document.getElementById('sumPlayer').innerHTML = `${resultPlayer}`
-        } else {
-            resultPC = result
-            window.document.getElementById('sumPC').innerHTML = `${resultPC}`
-        }
-    }
+
+
 }
 
 function play(): void {
-    var c = new Card();
-    console.log(c)
-    c.includesCard(c);
-    c.includesCardPlace(c)
-    c.refreshSum();
+    let c = new Cards();
+    c.push(c);
+    if (activePlayer === 0) {
+        resultPlayer = result
+        window.document.getElementById('sumPlayer').innerHTML = `${resultPlayer}`
+    } else {
+        resultPC = result
+        window.document.getElementById('sumPC').innerHTML = `${resultPC}`
+    }
 }
 
 function playPC(): void {
@@ -68,6 +66,7 @@ function playPC(): void {
     getWinner();
     refreshTotal();
 }
+
 function getWinner() {
     if (resultPlayer > resultPC && resultPlayer < 22 || resultPlayer < 22 && resultPC > 21) {
         totalPlayer++;
@@ -101,7 +100,9 @@ function init(): void {
 
 let cardButton = document.querySelector('#btnCard');
 cardButton.addEventListener('click', play);
+
 let btnStand = document.querySelector('#btnStand');
 btnStand.addEventListener('click', playPC)
+
 let btnNewGame = document.querySelector('#btnNewGame');
 btnNewGame.addEventListener('click', init)
