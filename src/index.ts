@@ -27,102 +27,143 @@ var arrQuestion = [
     {
         question: 'Забороняється проведення огляду місця події за фактом вибуху: ',
         answers: ['без узгодження зі спеціалістами відповідних служб (служби електропостачання, газової служби, водоканалу тощо) щодо можливості безпечного перебування на місці вибуху;', 'без огляду території на наявність вторинних вибухових пристроїв або залишків вибухових речовин, що не прореагували;', 'без огляду території на наявність вторинних вибухових пристроїв або вибухонебезпечних залишків або частин вибухового пристрою, що вибухнув;', 'вірно у п. 1 та 3.'],
-        correct: 2
+        correct: 3
     },
+
 ]
+var arrOfQuestions: number[] = [];
+var arrOfCorrectAnswers: string[] = [];
+var arrOfAnswers: string[] = [];
 var result = 0;
-var arr3: number[] = [];
-var arr: string[] = [];
-var arr2: string[] = [];
-let btnNext = document.getElementById('btnNext').addEventListener('click', nextQuestion);
-let btnCheck = document.getElementById('btnCheck').addEventListener('click', check)
-let btnStop = document.getElementById('btnStop').addEventListener('click', stop)
+var isEnd = false;
 
-function nextQuestion(): void {
-    let placeDiv2 = document.getElementById('div')
-    placeDiv2.textContent = ``
+class Test {
+    private question: string;
+    private rQestion: number;
+    private answers: string[];
+    private correct: number;
+
+    constructor(rand: number) {
+        this.question = arrQuestion[rand].question;
+        this.answers = arrQuestion[rand].answers;
+        this.correct = arrQuestion[rand].correct;
+        this.rQestion = rand;
+    }
+
+    createForm() {
+        let body = document.getElementById('divFirst');
+        let form = document.createElement('form');
+        form.id = 'form'
+        let p = document.createElement('p');
+        p.id = 'p';
+        p.innerHTML = this.question
+        body.appendChild(form).appendChild(p);
+        for (let i = 0; i < this.answers.length; i++) {
+            let form = document.getElementById('form');
+            let input = document.createElement('input');
+            let br = document.createElement('br');
+            input.id = arrQuestion[this.rQestion].answers[i];
+            input.type = 'radio';
+            input.name = 'choice';
+            let label = document.createElement('label');
+            label.innerHTML = arrQuestion[this.rQestion].answers[i];
+            label.htmlFor = arrQuestion[this.rQestion].answers[i];
+            form.appendChild(input)
+            form.appendChild(label)
+            form.appendChild(br);
+        }
+    }
+}
+
+function randomQuestion(): number {
     let randQuestion = Math.floor(Math.random() * arrQuestion.length);
-    if (arr3.includes(randQuestion)) {
-        nextQuestion();
+    if (arrOfCorrectAnswers.length === arrQuestion.length) {
+        stop('Questions end!');
+        return;
+    } else if (arrOfCorrectAnswers.includes(arrQuestion[randQuestion].answers[arrQuestion[randQuestion].correct])) {
+        return randomQuestion();
     } else {
-        arr3.push(randQuestion);
+        arrOfQuestions.push(randQuestion);
+        arrOfCorrectAnswers.push(arrQuestion[randQuestion].answers[arrQuestion[randQuestion].correct]);
+        return randQuestion;
     }
-    arr2.push(arrQuestion[randQuestion].answers[arrQuestion[randQuestion].correct]);
-
-    createQuestion(randQuestion);
-    //console.log(randQuestion)
 }
 
-function createQuestion(rand: number): void {
-    let placeDiv = document.getElementById('qst')
-    placeDiv.innerHTML = arrQuestion[rand].question;
-
-    createAnswers(rand);
+function start(): void {
+    let test = new Test(randomQuestion());
+    test.createForm()
+    btnStart.style.display = 'none'
+    btnNext.style.display = '';
+    btnStop.style.display = '';
+    startTimer();
 }
 
-function createAnswers(rand: number): void {
-    let correct = arrQuestion[rand].correct;
+function next(): void {
+    check();
+    let div = document.getElementById('divFirst')
+    div.innerHTML = ``
+    let test = new Test(randomQuestion());
+    test.createForm()
+}
 
-
-    let placeDiv = document.getElementById('div')
-    placeDiv.textContent = ``
-    for (let i = 0; i < arrQuestion[rand].answers.length; i++) {
-        let label = window.document.createElement('label')
-        let input = window.document.createElement('input')
-        let br = window.document.createElement('br')
-        input.type = 'radio'
-        input.name = 'contact'
-        input.className = 'check'
-        input.id = arrQuestion[rand].answers[i];
-        //label.htmlFor = 'choice';
-        label.innerHTML = arrQuestion[rand].answers[i];
-        label.htmlFor = arrQuestion[rand].answers[i];
-        placeDiv.appendChild(input)
-        placeDiv.appendChild(label)
-        placeDiv.appendChild(br)
+function stop(msg: string): void {
+    isEnd = true
+    let div = document.getElementById('divFirst')
+    div.innerHTML = ``
+    btnStart.style.display = 'none'
+    btnNext.style.display = 'none';
+    btnStop.style.display = 'none';
+    for (let i = 0; i < arrOfAnswers.length; i++) {
+        if (arrOfAnswers[i] === arrOfCorrectAnswers[i]) {
+            result++;
+        }
     }
+    let res = document.getElementById('correct')
+    res.innerHTML = 'Correct answers - ' + result
 }
 
 function check() {
-    let nameCheckbox = document.getElementsByName('contact');
-    for (let i = 0; i < nameCheckbox.length; i++) {
-        let q = 0;
-        if (nameCheckbox[i].checked) {
-            arr.push(nameCheckbox[i].id)
+    let inputChecked = document.getElementsByTagName('input');
+    let q = 0;
+    for (let i = 0; i < inputChecked.length; i++) {
+        if (inputChecked[i].checked) {
+            arrOfAnswers.push(inputChecked[i].id);
             q++;
         }
+    };
+    if (q === 0) {
+        arrOfAnswers.push('NA');
     }
-    if (!arr[arr2.length - 1]) {
-        arr.push('Not answer!')
-    }
-
-    console.log(arr)
-    console.log(arr2)
-    nextQuestion()
 }
-function stop() {
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i] === arr2[i]) {
-            result++;
+
+function startTimer() {
+    const startingMinutes = 20;
+    let time = startingMinutes * 60
+    const countdownEl = document.getElementById('countdown');
+    var refreshInterval = setInterval(updateCountdown, 1000)
+    function updateCountdown() {
+        const minutes = Math.floor(time / 60)
+        let seconds: number | string = time % 60
+        seconds = seconds < 10 ? '0' + seconds : seconds
+        countdownEl.innerHTML = `${minutes}:${seconds}`
+        time--;
+        if (time < 0) {
+            clearInterval(refreshInterval);
+            stop();
+        } else if (isEnd) {
+            clearInterval(refreshInterval);
         }
+    }
+}
 
-    }
-    clearInterval(refreshInterval)
-    console.log(result)
-}
-//console.log(nameCheckbox[0].id)
-const startingMinutes = 20;
-let time = startingMinutes * 60
-const countdownEl = document.getElementById('countdown');
-var refreshInterval = setInterval(updateCountdown, 1000)
-function updateCountdown() {
-    const minutes = Math.floor(time / 60)
-    let seconds: number | string = time % 60
-    seconds = seconds < 10 ? '0' + seconds : seconds
-    countdownEl.innerHTML = `${minutes}:${seconds}`
-    time--
-    if (time < 0) {
-        clearInterval(refreshInterval)
-        stop()
-    }
-}
+
+let btnStart = document.getElementById('btnStart');
+btnStart.addEventListener('click', start);
+
+let btnNext = document.getElementById('btnNext');
+btnNext.addEventListener('click', next);
+btnNext.style.display = 'none';
+
+let btnStop = document.getElementById('btnStop');
+btnStop.addEventListener('click', stop);
+btnStop.style.display = 'none';
