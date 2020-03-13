@@ -122,7 +122,7 @@ function stop(msg: string): void {
     }
 
     let res = document.getElementById('correct')
-    res.innerHTML = 'Correct answers - ' + result + ' from ' + arrQuestion.length + '<br>' + 'Percent - ' + result * 100 / arrOfAnswers.length + '%'
+    res.innerHTML = 'Correct answers - ' + result + ' from ' + arrQuestion.length + '<br>' + 'Percent - ' + Math.floor(result * 100 / arrOfAnswers.length) + '%'
 }
 
 function check() {
