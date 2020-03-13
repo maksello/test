@@ -59,15 +59,16 @@ class Test {
         p.innerHTML = this.question
         body.appendChild(form).appendChild(p);
         for (let i = 0; i < this.answers.length; i++) {
+            let a = arrQuestion[this.rQestion].answers[i];
             let form = document.getElementById('form');
             let input = document.createElement('input');
             let br = document.createElement('br');
-            input.id = arrQuestion[this.rQestion].answers[i];
+            input.id = a;
             input.type = 'radio';
             input.name = 'choice';
             let label = document.createElement('label');
-            label.innerHTML = arrQuestion[this.rQestion].answers[i];
-            label.htmlFor = arrQuestion[this.rQestion].answers[i];
+            label.innerHTML = a;
+            label.htmlFor = a;
             form.appendChild(input)
             form.appendChild(label)
             form.appendChild(br);
@@ -77,14 +78,15 @@ class Test {
 
 function randomQuestion(): number {
     let randQuestion = Math.floor(Math.random() * arrQuestion.length);
+    let a = arrQuestion[randQuestion].answers[arrQuestion[randQuestion].correct];
     if (arrOfCorrectAnswers.length === arrQuestion.length) {
         stop('Questions end!');
         return;
-    } else if (arrOfCorrectAnswers.includes(arrQuestion[randQuestion].answers[arrQuestion[randQuestion].correct])) {
+    } else if (arrOfCorrectAnswers.includes(a)) {
         return randomQuestion();
     } else {
         arrOfQuestions.push(randQuestion);
-        arrOfCorrectAnswers.push(arrQuestion[randQuestion].answers[arrQuestion[randQuestion].correct]);
+        arrOfCorrectAnswers.push(a);
         return randQuestion;
     }
 }
@@ -118,8 +120,9 @@ function stop(msg: string): void {
             result++;
         }
     }
+
     let res = document.getElementById('correct')
-    res.innerHTML = 'Correct answers - ' + result
+    res.innerHTML = 'Correct answers - ' + result + ' from ' + arrQuestion.length + '<br>' + 'Percent - ' + result * 100 / arrOfAnswers.length + '%'
 }
 
 function check() {
@@ -155,7 +158,6 @@ function startTimer() {
         }
     }
 }
-
 
 let btnStart = document.getElementById('btnStart');
 btnStart.addEventListener('click', start);
